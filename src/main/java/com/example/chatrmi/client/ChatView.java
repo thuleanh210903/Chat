@@ -27,35 +27,33 @@ public class ChatView extends JFrame implements Runnable{
     private Vector<String> listClients;
     private String name;
     private GroupLayout groupLayout;
-    
 
-    public ChatView(String name,String autorization,InterfaceServer server) {
+
+    public ChatView(String name, InterfaceServer server) {
         initComponents();
-        
+
         this.server = server;
         this.name = name;
-        
 
-        if(autorization.equals("Administrator")){
-            System.out.print(autorization);
-            listConnect.setComponentPopupMenu(jPopupMenu1);
-        }
-        
+
+        listConnect.setComponentPopupMenu(jPopupMenu1);
+
+
         this.setLocationRelativeTo(null);
         this.setTitle("Chat (" + name + ")");
         ImageIcon iconChat = new ImageIcon("img/chat.jpg");
         setIconImage(iconChat.getImage());
-        
+
         groupLayout = new GroupLayout(jPanel1);
         jPanel1.setLayout(new GridLayout(100,1));
         jPanel1.setBorder(new EmptyBorder(5, 10, 10, 10));
-        
 
-        this.addWindowListener(new java.awt.event.WindowAdapter() {    
+
+        this.addWindowListener(new java.awt.event.WindowAdapter() {
             @Override
             public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                if (JOptionPane.showConfirmDialog(new JFrame(), 
-                    "Are you sure you want to close this chat ?", "Close chat?", 
+                if (JOptionPane.showConfirmDialog(new JFrame(),
+                    "Are you sure you want to close this chat ?", "Close chat?",
                     JOptionPane.YES_NO_OPTION,
                     JOptionPane.QUESTION_MESSAGE) == JOptionPane.YES_OPTION){
                     try {
@@ -65,12 +63,12 @@ public class ChatView extends JFrame implements Runnable{
                     }
                     System.exit(0);
                 }else{
-                   
+
                 }
             }
         });
-        
 
+        //input msg
         inputMsg.setForeground(Color.GRAY);
         inputMsg.setText("Enter your Message ...");
         inputMsg.addFocusListener(new FocusListener() {
@@ -89,17 +87,17 @@ public class ChatView extends JFrame implements Runnable{
             }
         }
         });
-        
+
 
         listClients = new Vector<>();
         listConnect.setListData(listClients);
-        
+
         try{
             client = new ChatClient(name,server,inputMsg,listMessage,jPanel1);
         } catch (RemoteException ex) {
             System.out.println("Error: " + ex.getMessage());
         }
-        
+
 
         Timer minuteur = new Timer();
         TimerTask tache = new TimerTask() {
@@ -125,53 +123,28 @@ public class ChatView extends JFrame implements Runnable{
 
         this.setVisible(true);
     }
-    
+
 
 
     private void initComponents() {
 
         jPopupMenu1 = new javax.swing.JPopupMenu();
-        jMenuItem1 = new javax.swing.JMenuItem();
-        jMenuItem2 = new javax.swing.JMenuItem();
-        jMenuItem3 = new javax.swing.JMenuItem();
-        jScrollPane1 = new javax.swing.JScrollPane();
+        connectedListScroll = new javax.swing.JScrollPane();
         listConnect = new javax.swing.JList<>();
-        jScrollPane2 = new javax.swing.JScrollPane();
         inputMsg = new javax.swing.JTextArea();
         btnSend = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         listMessage = new javax.swing.JTextArea();
-        jLabel2 = new JLabel();
-        jButton1 = new javax.swing.JButton();
-        jButton3 = new javax.swing.JButton();
+        connectedLabel = new JLabel();
+        refreshBtn = new javax.swing.JButton();
+        uploadBtn = new javax.swing.JButton();
         jScrollPane4 = new javax.swing.JScrollPane();
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new JLabel();
+        messageScroll = new JScrollPane();
 
-        jMenuItem1.setText("Remove Users");
-        jMenuItem1.setActionCommand("");
-        jMenuItem1.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem1ActionPerformed(evt);
-            }
-        });
-        jPopupMenu1.add(jMenuItem1);
 
-        jMenuItem2.setText("Block Users");
-        jMenuItem2.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem2ActionPerformed(evt);
-            }
-        });
-        jPopupMenu1.add(jMenuItem2);
 
-        jMenuItem3.setText("Reactive Users");
-        jMenuItem3.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jMenuItem3ActionPerformed(evt);
-            }
-        });
-        jPopupMenu1.add(jMenuItem3);
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DO_NOTHING_ON_CLOSE);
         setResizable(false);
@@ -183,23 +156,19 @@ public class ChatView extends JFrame implements Runnable{
             public String getElementAt(int i) { return strings[i]; }
         });
         listConnect.setToolTipText("");
-        jScrollPane1.setViewportView(listConnect);
+        connectedListScroll.setViewportView(listConnect);
 
         inputMsg.setColumns(20);
         inputMsg.setRows(5);
         inputMsg.setToolTipText("Enter your Message ...");
         inputMsg.setMargin(new java.awt.Insets(6, 0, 0, 16));
-        jScrollPane2.setViewportView(inputMsg);
         inputMsg.getAccessibleContext().setAccessibleName("Enter your Message ...");
+        inputMsg.setLineWrap(true); // Cho phép tự động xuống dòng
+        inputMsg.setWrapStyleWord(true);  // Đảm bảo từ không bị cắt khi xuống dòng
+        messageScroll.setViewportView(inputMsg);
+        messageScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER); // Ẩn thanh cuộn dọc
 
-        btnSend.setFont(new java.awt.Font("Dialog", 1, 14)); // NOI18N
-        btnSend.setText("Send");
-        btnSend.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        btnSend.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                btnSendActionPerformed(evt);
-            }
-        });
+
 
         listMessage.setEditable(false);
         listMessage.setColumns(20);
@@ -208,31 +177,48 @@ public class ChatView extends JFrame implements Runnable{
         listMessage.setRequestFocusEnabled(false);
         jScrollPane3.setViewportView(listMessage);
 
-        jLabel2.setFont(new java.awt.Font("Dialog", 0, 16));
-        jLabel2.setText("Connected Clients");
+        connectedLabel.setFont(new java.awt.Font("Dialog", 0, 16));
+        connectedLabel.setText("Connected Client List");
 
-        jButton1.setText("Refresh");
-        jButton1.setActionCommand("");
-        jButton1.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        refreshBtn.setText("Refresh");
+        refreshBtn.setActionCommand("");
+        refreshBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        refreshBtn.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                refreshBtnActionPerformed(evt);
             }
         });
 
-        jButton3.setIcon(new ImageIcon("img/file-upload.png"));
-        jButton3.setToolTipText("upload File");
-        jButton3.setBorderPainted(false);
-        jButton3.setContentAreaFilled(false);
-        jButton3.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        jButton3.setDefaultCapable(false);
-        jButton3.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
-        jButton3.setMargin(new java.awt.Insets(0, 0, 0, 0));
-        jButton3.addActionListener(new java.awt.event.ActionListener() {
+
+        btnSend.setIcon(new ImageIcon("img/send.png"));
+        btnSend.setToolTipText("Send");
+        btnSend.setBorderPainted(false);
+        btnSend.setContentAreaFilled(false);
+        btnSend.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        btnSend.setDefaultCapable(false);
+        btnSend.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton3ActionPerformed(evt);
+                btnSendActionPerformed(evt);
             }
         });
+
+
+
+        uploadBtn.setIcon(new ImageIcon("img/file-upload.png"));
+        uploadBtn.setToolTipText("upload File");
+        uploadBtn.setBorderPainted(false);
+        uploadBtn.setContentAreaFilled(false);
+        uploadBtn.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        uploadBtn.setDefaultCapable(false);
+        uploadBtn.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+        uploadBtn.setMargin(new java.awt.Insets(0, 0, 0, 0));
+        uploadBtn.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                uploadBtnActionPerformed(evt);
+            }
+        });
+
+
 
         jPanel1.setFont(new java.awt.Font("Dialog", 0, 14));
 
@@ -266,17 +252,17 @@ public class ChatView extends JFrame implements Runnable{
                                 .addComponent(jScrollPane3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE))
                             .addGap(27, 27, 27))
                         .addGroup(layout.createSequentialGroup()
-                            .addComponent(jScrollPane2, GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE)
+                            .addComponent(messageScroll, GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE)
                             .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(jButton3, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)))
+                            .addComponent(uploadBtn, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel1))
                 .addGap(12, 12, 12)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
                         .addGap(8, 8, 8)
-                        .addComponent(jLabel2))
-                    .addComponent(jScrollPane1)
-                    .addComponent(jButton1, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+                        .addComponent(connectedLabel))
+                    .addComponent(connectedListScroll)
+                    .addComponent(refreshBtn, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
                     .addComponent(btnSend, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap(42, Short.MAX_VALUE))
         );
@@ -286,11 +272,11 @@ public class ChatView extends JFrame implements Runnable{
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jLabel2)
+                        .addComponent(connectedLabel)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jScrollPane1, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE)
+                        .addComponent(connectedListScroll, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1))
+                        .addComponent(refreshBtn))
                     .addComponent(jScrollPane3, GroupLayout.PREFERRED_SIZE, 296, GroupLayout.PREFERRED_SIZE))
                 .addGap(16, 16, 16)
                 .addComponent(jLabel1)
@@ -299,9 +285,9 @@ public class ChatView extends JFrame implements Runnable{
                 .addGap(18, 18, 18)
                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
                     .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(jButton3, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
-                        .addComponent(btnSend, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
-                    .addComponent(jScrollPane2, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE))
+                        .addComponent(uploadBtn, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
+                            .addComponent(btnSend, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
+                    .addComponent(messageScroll, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE))
                 .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -324,39 +310,15 @@ public class ChatView extends JFrame implements Runnable{
     }
 
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void refreshBtnActionPerformed(java.awt.event.ActionEvent evt) {
         Thread thread = new Thread(this);
         thread.start();
     }
 
 
-    private void jMenuItem1ActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            server.removeClient(listConnect.getSelectedValuesList());
-        } catch (RemoteException ex) {
-            System.out.println("Error: " + ex.getMessage());
-        } 
-    }
-
-    private void jMenuItem2ActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            server.blockClient(listConnect.getSelectedValuesList());
-        } catch (RemoteException ex) {
-            System.out.println("Error: " + ex.getMessage());
-        }
-    }
 
 
-    private void jMenuItem3ActionPerformed(java.awt.event.ActionEvent evt) {
-        try {
-            server.reactiveClient(listConnect.getSelectedValuesList());
-        } catch (RemoteException ex) {
-            System.out.println("Error: " + ex.getMessage());
-        }
-    }
-
-
-    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {
+    private void uploadBtnActionPerformed(java.awt.event.ActionEvent evt) {
         JFileChooser jfc = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
         int returnValue = jfc.showOpenDialog(null);
         if (returnValue == JFileChooser.APPROVE_OPTION) {
@@ -406,21 +368,18 @@ public class ChatView extends JFrame implements Runnable{
             }
         }
     }
-    
+
 
     private javax.swing.JButton btnSend;
     private javax.swing.JTextArea inputMsg;
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton3;
+    private javax.swing.JButton refreshBtn;
+    private javax.swing.JButton uploadBtn;
     private JLabel jLabel1;
-    private JLabel jLabel2;
-    private javax.swing.JMenuItem jMenuItem1;
-    private javax.swing.JMenuItem jMenuItem2;
-    private javax.swing.JMenuItem jMenuItem3;
+    private JLabel connectedLabel;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPopupMenu jPopupMenu1;
-    private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JScrollPane jScrollPane2;
+    private javax.swing.JScrollPane connectedListScroll;
+    private javax.swing.JScrollPane messageScroll;
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JList<String> listConnect;

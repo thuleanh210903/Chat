@@ -36,7 +36,6 @@ public class LoginView extends JFrame {
         passwordLb = new JLabel();
         usernameTextField = new JTextField();
         passwordTextField = new JTextField();
-        jComboBox1 = new JComboBox<>();
 
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle("Log in");
@@ -67,8 +66,7 @@ public class LoginView extends JFrame {
                 jTextField1ActionPerformed(evt);
             }
         });
-        jComboBox1.setFont(new Font("Dialog", 0, 14)); // NOI18N
-        jComboBox1.setModel(new DefaultComboBoxModel<>(new String[] { "Simple User", "Administrator" }));
+
 
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -83,7 +81,6 @@ public class LoginView extends JFrame {
                                                         .addComponent(passwordLb))
                                                 .addPreferredGap(LayoutStyle.ComponentPlacement.UNRELATED)
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                                                        .addComponent(jComboBox1, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                                                         .addComponent(usernameTextField)
                                                         .addComponent(passwordTextField)
                                                 )
@@ -106,7 +103,7 @@ public class LoginView extends JFrame {
                                         .addComponent(passwordLb)
                                         .addComponent(passwordTextField, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
                                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                                        .addComponent(jComboBox1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                        )
                                 .addGap(18, 18, 18)
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)
                                 .addComponent(loginBtn)
@@ -144,7 +141,7 @@ public class LoginView extends JFrame {
 
     private void openChatView(String username) {
         SwingUtilities.invokeLater(() -> {
-            new ChatView(username, (String) jComboBox1.getSelectedItem(), server);
+            new ChatView(username, server);
             this.dispose();
         });
     }
@@ -172,7 +169,6 @@ public class LoginView extends JFrame {
 
 
     private JButton loginBtn;
-    private JComboBox<String> jComboBox1;
     private JLabel usernameLb;
     private JLabel passwordLb;
     private JTextField usernameTextField;
