@@ -22,7 +22,7 @@ public class RegisterView extends JFrame{
 
         try {
             server = (InterfaceServer) Naming.lookup("rmi://localhost:4321/remote");
-            clientServer = new ChatClient("YourClientName", server, new JTextArea(), new JTextArea(), new JPanel());
+            clientServer = new ChatClient("YourClientName", server, new JTextPane(), new JTextPane(), new JPanel());
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             ex.printStackTrace();
             System.out.println("Error: " + ex.getMessage());

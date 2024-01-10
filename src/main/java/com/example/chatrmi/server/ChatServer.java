@@ -1,10 +1,13 @@
 package com.example.chatrmi.server;
 
+import java.io.File;
 import java.rmi.RemoteException;
 import java.rmi.server.UnicastRemoteObject;
 import java.util.ArrayList;
 import com.example.chatrmi.controller.ConnectDatabase;
 import com.example.chatrmi.client.InterfaceClient;
+
+import javax.swing.*;
 import java.util.List;
 import java.util.Vector;
 
@@ -41,22 +44,41 @@ public class ChatServer extends UnicastRemoteObject implements InterfaceServer{
     
 
     @Override
-    public synchronized void broadcastMessage(ArrayList<Integer> inc, List<String> list,String filename) throws RemoteException {
+    public synchronized void broadcastMessage(ArrayList<Integer> inc, List<String> list, File file) throws RemoteException {
         if(list.isEmpty()){
             int i= 0;
             while (i < clients.size()){
-                clients.get(i++).retrieveMessage(filename,inc);
+                clients.get(i++).retrieveMessage(file,inc);
             }
         }else{
             for (InterfaceClient client : clients) {
                 for(int i=0;i<list.size();i++){
                     if(client.getName().equals(list.get(i))){
-                        client.retrieveMessage(filename,inc);
+                        client.retrieveMessage(file,inc);
                     }
                 }
             }
         }
     }
+
+    @Override
+    public synchronized void broadcastMessage(String name ,Icon emoji, List<String> list) throws RemoteException {
+        if(list.isEmpty()){
+            int i= 0;
+            while (i < clients.size()){
+                clients.get(i++).retrieveMessage(name, emoji);
+            }
+        }else{
+            for (InterfaceClient client : clients) {
+                for(int i=0;i<list.size();i++){
+                    if(client.getName().equals(list.get(i))){
+                        client.retrieveMessage(name, emoji);
+                    }
+                }
+            }
+        }
+    }
+
         
 
     @Override

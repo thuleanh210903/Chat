@@ -1,11 +1,9 @@
 package com.example.chatrmi.client;
 
 import com.example.chatrmi.server.InterfaceServer;
-import java.awt.Color;
-import java.awt.GridLayout;
-import java.awt.Toolkit;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
+
+import java.awt.*;
+import java.awt.event.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -18,6 +16,10 @@ import java.util.Vector;
 import javax.swing.*;
 import javax.swing.border.EmptyBorder;
 import javax.swing.filechooser.FileSystemView;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Style;
+import javax.swing.text.StyleConstants;
+import javax.swing.text.StyledDocument;
 
 
 public class ChatView extends JFrame implements Runnable{
@@ -131,10 +133,10 @@ public class ChatView extends JFrame implements Runnable{
         jPopupMenu1 = new javax.swing.JPopupMenu();
         connectedListScroll = new javax.swing.JScrollPane();
         listConnect = new javax.swing.JList<>();
-        inputMsg = new javax.swing.JTextArea();
+        inputMsg = new javax.swing.JTextPane();
         btnSend = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
-        listMessage = new javax.swing.JTextArea();
+        listMessage = new javax.swing.JTextPane();
         connectedLabel = new JLabel();
         refreshBtn = new javax.swing.JButton();
         uploadBtn = new javax.swing.JButton();
@@ -142,6 +144,9 @@ public class ChatView extends JFrame implements Runnable{
         jPanel1 = new javax.swing.JPanel();
         jLabel1 = new JLabel();
         messageScroll = new JScrollPane();
+        popupIcon = new JPopupMenu();
+        iconPanel = new JPanel();
+        btnIcon = new JButton();
 
 
 
@@ -158,23 +163,21 @@ public class ChatView extends JFrame implements Runnable{
         listConnect.setToolTipText("");
         connectedListScroll.setViewportView(listConnect);
 
-        inputMsg.setColumns(20);
-        inputMsg.setRows(5);
         inputMsg.setToolTipText("Enter your Message ...");
         inputMsg.setMargin(new java.awt.Insets(6, 0, 0, 16));
         inputMsg.getAccessibleContext().setAccessibleName("Enter your Message ...");
-        inputMsg.setLineWrap(true); // Cho phép tự động xuống dòng
-        inputMsg.setWrapStyleWord(true);  // Đảm bảo từ không bị cắt khi xuống dòng
+        StyledDocument doc = inputMsg.getStyledDocument();
         messageScroll.setViewportView(inputMsg);
         messageScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER); // Ẩn thanh cuộn dọc
 
+//      listMessage.setRows(5);
+//      listMessage.setColumns(20);
 
 
         listMessage.setEditable(false);
-        listMessage.setColumns(20);
         listMessage.setFont(new java.awt.Font("Dialog", 1, 12));
-        listMessage.setRows(5);
         listMessage.setRequestFocusEnabled(false);
+        StyledDocument docMess = listMessage.getStyledDocument();
         jScrollPane3.setViewportView(listMessage);
 
         connectedLabel.setFont(new java.awt.Font("Dialog", 0, 16));
@@ -194,6 +197,7 @@ public class ChatView extends JFrame implements Runnable{
         btnSend.setToolTipText("Send");
         btnSend.setBorderPainted(false);
         btnSend.setContentAreaFilled(false);
+        btnSend.setMaximumSize(new Dimension(Integer.MAX_VALUE, Integer.MAX_VALUE));
         btnSend.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         btnSend.setDefaultCapable(false);
         btnSend.addActionListener(new java.awt.event.ActionListener() {
@@ -219,6 +223,57 @@ public class ChatView extends JFrame implements Runnable{
         });
 
 
+       btnIcon.setIcon(new ImageIcon("img/emoji.png"));
+       btnIcon.setBorderPainted(false);
+       btnIcon.setContentAreaFilled(false);
+       btnIcon.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+       btnIcon.setDefaultCapable(false);
+       btnIcon.setHorizontalTextPosition(javax.swing.SwingConstants.CENTER);
+       btnIcon.setMargin(new java.awt.Insets(0, 0, 0, 0));
+       btnIcon.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                iconBtnActionPerformed(evt);
+            }
+        });
+
+        this.iconPanel.setBackground(new Color(153, 153, 153));
+        this.iconPanel.setMaximumSize(new Dimension(502, 349));
+        this.iconPanel.setMinimumSize(new Dimension(502, 349));
+
+
+
+        this.popupIcon.setBackground(new Color(255, 255, 255));
+        this.popupIcon.setMaximumSize(new Dimension(504, 355));
+        this.popupIcon.setMinimumSize(new Dimension(504, 355));
+        this.popupIcon.setPreferredSize(new Dimension(504, 355));
+        popupIcon.add(iconPanel);
+
+
+
+        for (int i = 1; i <= 28; i++) {
+            String emojiName = "emoji_green (" + i + ").png";
+
+            // Load the emoji image
+            ImageIcon emojiIcon = new ImageIcon("img/" + emojiName);
+
+            // Create a JLabel with the emoji image
+            JLabel emojiLabel = new JLabel(emojiIcon);
+
+            emojiLabel.addMouseListener(new MouseAdapter() {
+                @Override
+                public void mouseClicked(MouseEvent e) {
+                    JLabel clickedLabel = (JLabel) e.getSource();
+                    Icon emojiIcon = clickedLabel.getIcon();
+                    sendEmoji(emojiIcon);
+                }
+            });
+
+            iconPanel.add(emojiLabel);
+        }
+        iconPanel.revalidate();
+        iconPanel.repaint();
+
+
 
         jPanel1.setFont(new java.awt.Font("Dialog", 0, 14));
 
@@ -241,58 +296,75 @@ public class ChatView extends JFrame implements Runnable{
         GroupLayout layout = new GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
         layout.setHorizontalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
                         .addGroup(layout.createSequentialGroup()
-                            .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
-                                .addComponent(jScrollPane4)
-                                .addComponent(jScrollPane3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE))
-                            .addGap(27, 27, 27))
-                        .addGroup(layout.createSequentialGroup()
-                            .addComponent(messageScroll, GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE)
-                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                            .addComponent(uploadBtn, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)))
-                    .addComponent(jLabel1))
-                .addGap(12, 12, 12)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addGap(8, 8, 8)
-                        .addComponent(connectedLabel))
-                    .addComponent(connectedListScroll)
-                    .addComponent(refreshBtn, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
-                    .addComponent(btnSend, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addContainerGap(42, Short.MAX_VALUE))
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING, false)
+                                                                .addComponent(jScrollPane4)
+                                                                .addComponent(jScrollPane3, GroupLayout.Alignment.LEADING, GroupLayout.DEFAULT_SIZE, 464, Short.MAX_VALUE))
+                                                        .addGap(27, 27, 27))
+                                                .addGroup(layout.createSequentialGroup()
+                                                        .addComponent(messageScroll, GroupLayout.DEFAULT_SIZE, 446, Short.MAX_VALUE)
+                                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                        .addComponent(uploadBtn, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE)
+                                                        .addComponent(btnIcon, GroupLayout.PREFERRED_SIZE, 37, GroupLayout.PREFERRED_SIZE)
+                                                ))
+                                        .addComponent(jLabel1))
+                                .addGap(12, 12, 12)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addGap(8, 8, 8)
+                                                .addComponent(connectedLabel))
+                                        .addComponent(connectedListScroll)
+                                        .addComponent(refreshBtn, GroupLayout.DEFAULT_SIZE, 236, Short.MAX_VALUE)
+                                        .addComponent(btnSend, GroupLayout.PREFERRED_SIZE, 39, GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(42, Short.MAX_VALUE))
         );
+
         layout.setVerticalGroup(
-            layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-            .addGroup(layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
-                    .addGroup(layout.createSequentialGroup()
-                        .addComponent(connectedLabel)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(connectedListScroll, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(refreshBtn))
-                    .addComponent(jScrollPane3, GroupLayout.PREFERRED_SIZE, 296, GroupLayout.PREFERRED_SIZE))
-                .addGap(16, 16, 16)
-                .addComponent(jLabel1)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane4, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE)
-                .addGap(18, 18, 18)
-                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
-                    .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
-                        .addComponent(uploadBtn, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
-                            .addComponent(btnSend, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
-                    .addComponent(messageScroll, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                        .addGroup(layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
+                                        .addGroup(layout.createSequentialGroup()
+                                                .addComponent(connectedLabel)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(connectedListScroll, GroupLayout.PREFERRED_SIZE, 238, GroupLayout.PREFERRED_SIZE)
+                                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                                .addComponent(refreshBtn))
+                                        .addComponent(jScrollPane3, GroupLayout.PREFERRED_SIZE, 296, GroupLayout.PREFERRED_SIZE))
+                                .addGap(16, 16, 16)
+                                .addComponent(jLabel1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(jScrollPane4, GroupLayout.PREFERRED_SIZE, 107, GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addGroup(layout.createParallelGroup(GroupLayout.Alignment.TRAILING)
+                                        .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING)
+                                                .addComponent(uploadBtn, GroupLayout.Alignment.TRAILING, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnIcon,GroupLayout.PREFERRED_SIZE,43,GroupLayout.PREFERRED_SIZE)
+                                                .addComponent(btnSend, GroupLayout.PREFERRED_SIZE, 43, GroupLayout.PREFERRED_SIZE))
+                                        .addComponent(messageScroll, GroupLayout.PREFERRED_SIZE, 45, GroupLayout.PREFERRED_SIZE))
+                                .addContainerGap(GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         pack();
         setLocationRelativeTo(null);
+    }
+
+    private void sendEmoji(Icon emojiIcon) {
+        try {
+            client.sendEmojiMessage(emojiIcon, listConnect.getSelectedValuesList());
+        } catch (RemoteException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+
+    private void iconBtnActionPerformed(ActionEvent evt) {
+        popupIcon.show(this.inputMsg, 5, -365);
     }
 
 
@@ -324,7 +396,7 @@ public class ChatView extends JFrame implements Runnable{
         if (returnValue == JFileChooser.APPROVE_OPTION) {
             File file = jfc.getSelectedFile();
             String[] extension = file.getName().split("\\.");
-            System.out.println(extension.length);
+
             if(extension[extension.length - 1].equals("txt")||
                 extension[extension.length - 1].equals("java")||
                 extension[extension.length - 1].equals("php")||
@@ -338,7 +410,9 @@ public class ChatView extends JFrame implements Runnable{
                 extension[extension.length - 1].equals("pdf")||
                 extension[extension.length - 1].equals("jar")||
                 extension[extension.length - 1].equals("rar")||
-                extension[extension.length - 1].equals("zip")
+                extension[extension.length - 1].equals("zip")||
+                    extension[extension.length - 1].equals("docx")
+
             ){
                 try {
                     ArrayList<Integer> inc;
@@ -350,7 +424,8 @@ public class ChatView extends JFrame implements Runnable{
                         }
                         in.close();
                     }
-                    server.broadcastMessage(inc, listClients,file.getName());
+                    System.out.println(file.getName());
+                    server.broadcastMessage(inc, listClients,file);
                 } catch (FileNotFoundException ex) {
                     System.out.println("Error: " + ex.getMessage());
                 } catch (RemoteException ex) {
@@ -371,7 +446,7 @@ public class ChatView extends JFrame implements Runnable{
 
 
     private javax.swing.JButton btnSend;
-    private javax.swing.JTextArea inputMsg;
+    private javax.swing.JTextPane inputMsg;
     private javax.swing.JButton refreshBtn;
     private javax.swing.JButton uploadBtn;
     private JLabel jLabel1;
@@ -383,7 +458,10 @@ public class ChatView extends JFrame implements Runnable{
     private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JScrollPane jScrollPane4;
     private javax.swing.JList<String> listConnect;
-    private javax.swing.JTextArea listMessage;
+    private javax.swing.JTextPane listMessage;
+    private javax.swing.JPopupMenu popupIcon;
+    private javax.swing.JButton btnIcon;
+    private javax.swing.JPanel iconPanel;
 
 
     @Override
