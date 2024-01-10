@@ -28,12 +28,12 @@ import javax.swing.text.StyledDocument;
 public class ChatClient extends UnicastRemoteObject implements InterfaceClient{
     private final InterfaceServer server;
     private final String name;
-    private final JTextPane input;
+    private final JTextArea input;
     private final JTextPane output;
     private final JPanel jpanel;
     
 
-    public ChatClient(String name , InterfaceServer server, JTextPane jtext1, JTextPane jtext2, JPanel jpanel) throws RemoteException{
+    public ChatClient(String name , InterfaceServer server, JTextArea jtext1, JTextPane jtext2, JPanel jpanel) throws RemoteException{
         this.name = name;
         this.server = server;
         this.input = jtext1;
@@ -51,8 +51,17 @@ public class ChatClient extends UnicastRemoteObject implements InterfaceClient{
 
     @Override
     public void retrieveMessage(String message) throws RemoteException {
-        output.setText(output.getText() + "\n" + message);
+        StyledDocument doc = output.getStyledDocument();
+        try {
+            int len = doc.getLength(); // Lưu độ dài ban đầu của document
+
+            // Chèn tin nhắn văn bản vào cuối
+            doc.insertString(len, "\n" + message, null);
+        } catch (BadLocationException e) {
+            e.printStackTrace();
+        }
     }
+
 
 
     @Override
@@ -69,7 +78,21 @@ public class ChatClient extends UnicastRemoteObject implements InterfaceClient{
                 int userSelection = fileChooser.showSaveDialog(null);
                 if (userSelection == JFileChooser.APPROVE_OPTION) {
                     File fileToSave = fileChooser.getSelectedFile();
-                    String filePath = fileToSave.getAbsolutePath()+".png";
+
+                    // Lấy tên file gốc và phần mở rộng
+                    String originalFileName = file.getName();
+                    String originalFileExtension = "";
+                    int lastDotIndex = originalFileName.lastIndexOf('.');
+                    if (lastDotIndex > 0) {
+                        originalFileExtension = originalFileName.substring(lastDotIndex + 1);
+                    }
+
+                    // Kiểm tra xem phần mở rộng có tồn tại không, nếu không thì thêm vào
+                    if (!fileToSave.getAbsolutePath().toLowerCase().endsWith(originalFileExtension.toLowerCase())) {
+                        fileToSave = new File(fileToSave.getAbsolutePath() + "." + originalFileExtension);
+                    }
+
+                    String filePath = fileToSave.getAbsolutePath();
                     try {
                         byte[] data = new byte[inc.size()];
                         for (int i = 0; i < inc.size(); i++) {
@@ -90,7 +113,6 @@ public class ChatClient extends UnicastRemoteObject implements InterfaceClient{
         jpanel.repaint();
         jpanel.revalidate();
     }
-
 
 
 
@@ -118,13 +140,16 @@ public class ChatClient extends UnicastRemoteObject implements InterfaceClient{
         StyledDocument doc = output.getStyledDocument();
         try {
             int len = doc.getLength(); // Lưu độ dài ban đầu của document
-            doc.insertString(len, name + ": ", null); // Chèn tên vào trước tin nhắn
+            doc.insertString(len, name, null); // Chèn tên vào trước tin nhắn
             len = doc.getLength(); // Cập nhật độ dài mới của document sau khi chèn tên
 
             // Chèn emoji vào cuối tin nhắn
-            Style style = doc.addStyle("icon", null);
-            StyleConstants.setIcon(style, emoji);
-            doc.insertString(len, " ", style);
+            if (emoji != null) {
+                Style style = doc.addStyle("icon", null);
+                StyleConstants.setIcon(style, emoji);
+                doc.insertString(len, " ", style); // Insert a space to separate the emoji from the text
+                len = doc.getLength(); // Update the length after inserting the emoji
+            }
 
             // Chèn ký tự xuống dòng để ngăn tin nhắn tiếp theo bị ghi đè lên
             doc.insertString(doc.getLength(), "\n", null);

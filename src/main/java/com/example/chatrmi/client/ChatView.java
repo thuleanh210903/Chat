@@ -133,7 +133,7 @@ public class ChatView extends JFrame implements Runnable{
         jPopupMenu1 = new javax.swing.JPopupMenu();
         connectedListScroll = new javax.swing.JScrollPane();
         listConnect = new javax.swing.JList<>();
-        inputMsg = new javax.swing.JTextPane();
+        inputMsg = new javax.swing.JTextArea();
         btnSend = new javax.swing.JButton();
         jScrollPane3 = new javax.swing.JScrollPane();
         listMessage = new javax.swing.JTextPane();
@@ -166,12 +166,9 @@ public class ChatView extends JFrame implements Runnable{
         inputMsg.setToolTipText("Enter your Message ...");
         inputMsg.setMargin(new java.awt.Insets(6, 0, 0, 16));
         inputMsg.getAccessibleContext().setAccessibleName("Enter your Message ...");
-        StyledDocument doc = inputMsg.getStyledDocument();
         messageScroll.setViewportView(inputMsg);
         messageScroll.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER); // Ẩn thanh cuộn dọc
 
-//      listMessage.setRows(5);
-//      listMessage.setColumns(20);
 
 
         listMessage.setEditable(false);
@@ -446,7 +443,7 @@ public class ChatView extends JFrame implements Runnable{
 
 
     private javax.swing.JButton btnSend;
-    private javax.swing.JTextPane inputMsg;
+    private javax.swing.JTextArea inputMsg;
     private javax.swing.JButton refreshBtn;
     private javax.swing.JButton uploadBtn;
     private JLabel jLabel1;

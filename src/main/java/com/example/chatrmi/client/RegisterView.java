@@ -22,7 +22,7 @@ public class RegisterView extends JFrame{
 
         try {
             server = (InterfaceServer) Naming.lookup("rmi://localhost:4321/remote");
-            clientServer = new ChatClient("YourClientName", server, new JTextPane(), new JTextPane(), new JPanel());
+            clientServer = new ChatClient("YourClientName", server, new JTextArea(), new JTextPane(), new JPanel());
         } catch (NotBoundException | MalformedURLException | RemoteException ex) {
             ex.printStackTrace();
             System.out.println("Error: " + ex.getMessage());
@@ -36,7 +36,7 @@ public class RegisterView extends JFrame{
         passwordLb = new JLabel();
         usernameField = new JTextField();
         passwordField = new JTextField();
-        jComboBox = new JComboBox<>();
+
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setTitle("Log in");
@@ -59,8 +59,9 @@ public class RegisterView extends JFrame{
 
         passwordLb.setFont(new Font("Dialog", 1, 14));
         passwordLb.setText("Password");
-        jComboBox.setFont(new Font("Dialog", 1, 14));
-        jComboBox.setModel(new DefaultComboBoxModel<>(new String[] {"Register User"}));
+
+       usernameField.setColumns(20); // Số ký tự tối đa mà usernameField có thể chứa
+       passwordField.setColumns(20);
 
 
         GroupLayout layout = new GroupLayout(getContentPane());
@@ -78,7 +79,7 @@ public class RegisterView extends JFrame{
                                                 .addGroup(layout.createParallelGroup(GroupLayout.Alignment.LEADING, false)
                                                         .addComponent(usernameField)
                                                         .addComponent(passwordField)
-                                                        .addComponent(jComboBox, 0, GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                                                       ))
                                         .addGroup(layout.createSequentialGroup()
                                                 .addGap(124, 124, 124)
                                                 .addComponent(registerBtn, GroupLayout.PREFERRED_SIZE, 92, GroupLayout.PREFERRED_SIZE)))
@@ -97,7 +98,6 @@ public class RegisterView extends JFrame{
                                         .addComponent(passwordLb)
                                         .addComponent(passwordField, GroupLayout.PREFERRED_SIZE, 27, GroupLayout.PREFERRED_SIZE))
                                 .addPreferredGap(LayoutStyle.ComponentPlacement.RELATED, 24, Short.MAX_VALUE)
-                                .addComponent(jComboBox, GroupLayout.PREFERRED_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.PREFERRED_SIZE)
                                 .addGap(20, 20, 20)
                                 .addComponent(registerBtn)
                                 .addGap(20, 20, 20))
@@ -133,7 +133,6 @@ public class RegisterView extends JFrame{
         });
     }
     private JButton registerBtn;
-    private JComboBox<String> jComboBox;
     private JLabel usernameLb;
     private JLabel passwordLb;
     private JTextField usernameField;
