@@ -15,7 +15,7 @@ public interface InterfaceServer extends Remote{
 
     boolean checkLogin(String username, String password) throws RemoteException;
 
-    void broadcastMessage(String message,List<String> list) throws RemoteException;
+    void broadcastMessage(String message,List<String> list, String name) throws RemoteException;
     
 
     void broadcastMessage(ArrayList<Integer> inc, List<String> list, File file) throws RemoteException;

@@ -69,7 +69,7 @@ public class ChatClient extends UnicastRemoteObject implements InterfaceClient{
                 int userSelection = fileChooser.showSaveDialog(null);
                 if (userSelection == JFileChooser.APPROVE_OPTION) {
                     File fileToSave = fileChooser.getSelectedFile();
-                    String filePath = fileToSave.getAbsolutePath();
+                    String filePath = fileToSave.getAbsolutePath()+".png";
                     try {
                         byte[] data = new byte[inc.size()];
                         for (int i = 0; i < inc.size(); i++) {
@@ -97,7 +97,7 @@ public class ChatClient extends UnicastRemoteObject implements InterfaceClient{
     @Override
     public void sendMessage(List<String> list) {
         try {
-            server.broadcastMessage(name + " : " + input.getText(),list);
+            server.broadcastMessage(name + " : " + input.getText(),list, name);
         } catch (RemoteException ex) {
             System.out.println("Error: " + ex.getMessage());
         }

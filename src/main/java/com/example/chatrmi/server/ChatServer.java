@@ -25,13 +25,14 @@ public class ChatServer extends UnicastRemoteObject implements InterfaceServer{
     
 
     @Override
-    public synchronized void broadcastMessage(String message,List<String> list) throws RemoteException {
+    public synchronized void broadcastMessage(String message,List<String> list, String name) throws RemoteException {
         if(list.isEmpty()){
             int i= 0;
             while (i < clients.size()){
                 clients.get(i++).retrieveMessage(message);
             }
         }else{
+            list.add(name);
             for (InterfaceClient client : clients) {
                 for(int i=0;i<list.size();i++){
                     if(client.getName().equals(list.get(i))){

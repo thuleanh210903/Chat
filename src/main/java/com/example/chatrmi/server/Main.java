@@ -94,13 +94,16 @@ public class Main extends javax.swing.JFrame {
 
     private void startServer() throws Exception {
         try {
-            chatServer = new ChatServer();
-            LocateRegistry.createRegistry(4321);
-            Naming.rebind("rmi://localhost:4321/remote", chatServer);
-            txt.setText("Server now starting");
-            lbStatus.setForeground(new Color(0,255,0));
-            lbStatus.setText("Server start");
-
+            if (chatServer!=null){
+                stopServer();
+            }else {
+                chatServer = new ChatServer();
+                LocateRegistry.createRegistry(4321);
+                Naming.rebind("rmi://localhost:4321/remote", chatServer);
+                txt.setText("Server now starting");
+                lbStatus.setForeground(new Color(0,255,0));
+                lbStatus.setText("Server start");
+            }
         } catch (MalformedURLException | RemoteException ex) {
             System.out.println("Error: " + ex.getMessage());
         }
@@ -112,9 +115,12 @@ public class Main extends javax.swing.JFrame {
                 if(chatServer!=null){
                     Naming.unbind("rmi://localhost:4321/remote"); // delete register service
                     UnicastRemoteObject.unexportObject(chatServer, true); //stop service
+                    Thread.sleep(2000);
                     txt.setText("Server stopped");
                     lbStatus.setForeground(new Color(255, 39, 39));
                     lbStatus.setText("Stop server");
+//                    chatServer =  new ChatServer();
+                    chatServer = null;
                 }
             } catch (Exception e) {
                 e.printStackTrace();
